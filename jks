@@ -1,2 +1,33 @@
  for notifications for android/ios
  
+devices_List = getDeviceList(sendtype, userid,devicetype);
+            Sender sender = new Sender(appsenderid);
+            Message message = new Message.Builder()
+                    .delayWhileIdle(false)
+                    .addData("message", notification_message)
+                   // .addData("msgcnt", "1")//For unread mesages
+                    .addData("title", apptitle)
+                    .addData("action", "PUSH ACTION")//you can get this message on client side app
+                    .addData("color", "#000")
+                    .addData("notId", String.valueOf(notificationid))
+                    .addData("style", "inbox")
+                    .addData("summaryText", "There are %n% notifications")
+                   // .addData("badge", "7")
+                    .addData("info", "super secret info")
+                    //.addData("content-available", "1")
+                    .build();
+                          Result result = null;
+            for (int m = 0; m < devices_List.size(); m++) {
+                map_message = (Map)devices_List.get(m);
+                try {
+                    result = sender.send(message, map_message.get("REGID").toString(), 1);
+                } catch (IOException ex) {
+                    Logger.getLogger(GCMServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                qry = "update admin.notificationserver set gcmmsgid='" + result.toString() + "' where id = '" + map.get("ID") + "'";
+                try {
+                    dao.executeUpdate(qry);
+                } catch (DaoException ex) {
+                    Logger.getLogger(GCMServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
